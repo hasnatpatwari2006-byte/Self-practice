@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Self Practice (সেলফ প্র্যাকটিস)</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+    header { background: #1e293b; border-bottom: 1px solid var(--card-border); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+    .logo-container { display: flex; align-items: center; gap: 12px; }
+    .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+    .logo-text h1 { font-size: 1.1rem; font-weight: 700; }
+    .logo-text p { font-size: 0.75rem; color: var(--text-muted); }
+    .stats-badge { background: #334155; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: #38bdf8; display: flex; align-items: center; gap: 6px; }
+    main { flex: 1; padding: 20px; max-width: 600px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px; }
+    .card { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2); }
+    .card-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .category-chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
+    .chip { background: #334155; color: var(--text-muted); border: 1px solid transparent; padding: 8px 14px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+    .chip.active { background: #2563eb; color: #fff; font-weight: 600; border-color: #60a5fa; }
+    .question-box { margin-top: 10px; }
+    .question-badge { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: #38bdf8; margin-bottom: 8px; display: inline-block; }
+    .question-text { font-size: 1.1rem; line-height: 1.5; font-weight: 600; margin-bottom: 18px; }
+    .options-grid { display: flex; flex-direction: column; gap: 10px; }
+    .option-btn { background: #334155; border: 2px solid #475569; border-radius: 10px; padding: 14px 16px; text-align: left; color: var(--text); font-size: 0.95rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
+    .option-btn:active { transform: scale(0.98); }
+    .option-btn.correct { background: rgba(16, 185, 129, 0.2); border-color: var(--success); color: #34d399; }
+    .option-btn.wrong { background: rgba(239, 68, 68, 0.2); border-color: var(--error); color: #f87171; }
+    .option-letter { width: 28px; height: 28px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
+    .explanation-box { margin-top: 16px; padding: 14px; background: rgba(59, 130, 246, 0.1); border-left: 4px solid var(--primary); border-radius: 0 8px 8px 0; font-size: 0.9rem; line-height: 1.5; color: #cbd5e1; display: none; }
+    .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+    .btn { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: background 0.2s; }
+    .btn:hover { background: var(--primary-hover); }
+    .btn-secondary { background: #334155; color: var(--text); }
+    .score-banner { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; margin-bottom: 12px; }
+    .score-card { background: #1e293b; border: 1px solid var(--card-border); padding: 12px; border-radius: 10px; }
+    .score-num { font-size: 1.3rem; font-weight: 700; }
+    .score-label { font-size: 0.75rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">SP</div>
+      <div class="logo-text">
+        <h1 id="appTitle">Self Practice</h1>
+        <p id="appSubtitle">সেলফ প্র্যাকটিস অ্যাপ</p>
+      </div>
+    </div>
+    <div class="stats-badge">
+      <span>⭐</span> <span id="totalPoints">0</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="score-banner">
+      <div class="score-card">
+        <div class="score-num" id="statCompleted" style="color:#38bdf8;">0</div>
+        <div class="score-label">অনুশীলন</div>
+      </div>
+      <div class="score-card">
+        <div class="score-num" id="statCorrect" style="color:#34d399;">0</div>
+        <div class="score-label">সঠিক</div>
+      </div>
+      <div class="score-card">
+        <div class="score-num" id="statAccuracy" style="color:#fbbf24;">0%</div>
+        <div class="score-label">সঠিকতার হার</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="category-chips">
+        <button class="chip active" onclick="filterCategory('all', this)">সকল বিষয় (All)</button>
+        <button class="chip" onclick="filterCategory('General Knowledge', this)">সাধারণ জ্ঞান</button>
+        <button class="chip" onclick="filterCategory('Science & Tech', this)">বিজ্ঞান ও প্রযুক্তি</button>
+        <button class="chip" onclick="filterCategory('Bangla & English', this)">ভাষা ও সাহিত্য</button>
+      </div>
+    </div>
+
+    <div class="card question-box">
+      <div class="card-title">
+        <span class="question-badge" id="categoryBadge">প্রশ্ন ১</span>
+        <span style="font-size: 0.85rem; color: var(--text-muted);" id="progressTracker">১ / ৫</span>
+      </div>
+      <div class="question-text" id="questionText">প্রশ্ন লোড হচ্ছে...</div>
+
+      <div class="options-grid" id="optionsContainer"></div>
+
+      <div class="explanation-box" id="explanationBox"></div>
+
+      <div class="controls">
+        <button class="btn btn-secondary" onclick="prevQuestion()" id="prevBtn">পূর্ববর্তী</button>
+        <button class="btn" onclick="nextQuestion()" id="nextBtn">পরবর্তী প্রশ্ন</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        category: "General Knowledge",
+        badge: "সাধারণ জ্ঞান",
+        question: "বাংলাদেশের জাতীয় স্মৃতিসৌধের স্থপতি কে?",
+        options: ["সৈয়দ মাইনুল হোসেন", "মাজহারুল ইসলাম", "হামিদুর রহমান", "তানভীর মোকাম্মেল"],
+        correct: 0,
+        explanation: "জাতীয় স্মৃতিসৌধ সাভারে অবস্থিত। এর মূল স্থপতি সৈয়দ মাইনুল হোসেন। এতে ৭ জোড়া স্তম্ভ রয়েছে।"
+      },
+      {
+        category: "Science & Tech",
+        badge: "বিজ্ঞান ও প্রযুক্তি",
+        question: "অ্যান্ড্রয়েড অপারেটিং সিস্টেমের মূল কার্নেল কোনটি?",
+        options: ["Windows NT", "Linux Kernel", "Darwin", "FreeBSD"],
+        correct: 1,
+        explanation: "অ্যান্ড্রয়েড অপারেটিং সিস্টেম ওপেন সোর্স লিনাক্স (Linux) কার্নেলের ওপর ভিত্তি করে তৈরি।"
+      },
+      {
+        category: "Science & Tech",
+        badge: "বিজ্ঞান ও প্রযুক্তি",
+        question: "কম্পিউটারের ব্রেন বা মস্তিষ্ক হিসেবে পরিচিত কোনটি?",
+        options: ["Hard Disk", "RAM", "CPU (Central Processing Unit)", "Motherboard"],
+        correct: 2,
+        explanation: "CPU সব গণনা ও প্রসেসিং নিয়ন্ত্রণ করে, তাই একে কম্পিউটারের মস্তিষ্ক বলা হয়।"
+      },
+      {
+        category: "Bangla & English",
+        badge: "ভাষা ও সাহিত্য",
+        question: "বাংলা সাহিত্যের প্রথম মহাকাব্য কোনটি?",
+        options: ["পদ্মাবতী", "মেঘনাদবধ কাব্য", "মনসামঙ্গল", "অন্নদামঙ্গল"],
+        correct: 1,
+        explanation: "মাইকেল মধুসূদন দত্ত রচিত 'মেঘনাদবধ কাব্য' (১৮৬১) বাংলা সাহিত্যের প্রথম আধুনিক সার্থক মহাকাব্য।"
+      },
+      {
+        category: "General Knowledge",
+        badge: "সাধারণ জ্ঞান",
+        question: "আন্তর্জাতিক মাতৃভাষা দিবস কত তারিখে পালিত হয়?",
+        options: ["২৬ মার্চ", "১৬ ডিসেম্বর", "২১ ফেব্রুয়ারি", "৭ মার্চ"],
+        correct: 2,
+        explanation: "ইউনেস্কো ১৯৯৯ সালের ১৭ নভেম্বর ২১শে ফেব্রুয়ারিকে আন্তর্জাতিক মাতৃভাষা দিবস হিসেবে ঘোষণা করে।"
+      }
+    ];
+
+    let currentIndex = 0;
+    let selectedAnswers = {};
+    let totalScore = 0;
+
+    function init() {
+      try {
+        const saved = localStorage.getItem('sp_answers');
+        if (saved) selectedAnswers = JSON.parse(saved);
+      } catch (e) {}
+      renderQuestion();
+      updateStats();
+    }
+
+    function renderQuestion() {
+      const q = questions[currentIndex];
+      document.getElementById('categoryBadge').innerText = q.badge;
+      document.getElementById('progressTracker').innerText = (currentIndex + 1) + ' / ' + questions.length;
+      document.getElementById('questionText').innerText = q.question;
+      
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = '';
+      const letters = ['ক', 'খ', 'গ', 'ঘ'];
+      
+      const isAnswered = selectedAnswers[currentIndex] !== undefined;
+      const userChoice = selectedAnswers[currentIndex];
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        if (isAnswered) {
+          if (idx === q.correct) btn.classList.add('correct');
+          if (idx === userChoice && userChoice !== q.correct) btn.classList.add('wrong');
+        }
+        btn.innerHTML = '<span class="option-letter">' + letters[idx] + '</span> <span>' + opt + '</span>';
+        btn.onclick = () => selectOption(idx);
+        container.appendChild(btn);
+      });
+
+      const expBox = document.getElementById('explanationBox');
+      if (isAnswered) {
+        expBox.style.display = 'block';
+        expBox.innerHTML = '<strong>ব্যাখ্যা:</strong> ' + q.explanation;
+      } else {
+        expBox.style.display = 'none';
+      }
+
+      document.getElementById('prevBtn').style.opacity = currentIndex === 0 ? '0.5' : '1';
+    }
+
+    function selectOption(index) {
+      if (selectedAnswers[currentIndex] !== undefined) return;
+      selectedAnswers[currentIndex] = index;
+      try {
+        localStorage.setItem('sp_answers', JSON.stringify(selectedAnswers));
+      } catch(e) {}
+      renderQuestion();
+      updateStats();
+    }
+
+    function nextQuestion() {
+      if (currentIndex < questions.length - 1) {
+        currentIndex++;
+        renderQuestion();
+      } else {
+        alert('অভিনন্দন! আপনি সকল প্রশ্ন সম্পন্ন করেছেন। মোট স্কোর: ' + calculateScore() + ' / ' + questions.length);
+      }
+    }
+
+    function prevQuestion() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+      }
+    }
+
+    function calculateScore() {
+      let count = 0;
+      Object.keys(selectedAnswers).forEach(key => {
+        if (selectedAnswers[key] === questions[key].correct) count++;
+      });
+      return count;
+    }
+
+    function updateStats() {
+      const completed = Object.keys(selectedAnswers).length;
+      const correct = calculateScore();
+      const accuracy = completed > 0 ? Math.round((correct / completed) * 100) : 0;
+      
+      document.getElementById('statCompleted').innerText = completed;
+      document.getElementById('statCorrect').innerText = correct;
+      document.getElementById('statAccuracy').innerText = accuracy + '%';
+      document.getElementById('totalPoints').innerText = correct * 10;
+    }
+
+    function filterCategory(cat, btn) {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>
